@@ -7,8 +7,7 @@ import com.example.productservice.repository.ProductRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Qualifier("SelfProductService")
@@ -34,13 +33,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
-        Optional<Category> categoryOptional = this.categoryRepo.findByName(product.getCategory().getName());
-        if (categoryOptional.isPresent()) {
-            product.setCategory(categoryOptional.get());
-        } else {
-            Category category = categoryRepo.save(product.getCategory());
-            product.setCategory(category);
-        }
+//        Optional<Category> categoryOptional = this.categoryRepo.findByName(product.getCategory().getName());
+//        if (categoryOptional.isPresent()) {
+//            product.setCategory(categoryOptional.get());
+//        } else {
+//            Category category = categoryRepo.save(product.getCategory());
+//            product.setCategory(category);
+//        }
         return this.productRepo.save(product);
     }
 
@@ -73,7 +72,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteAllProducts() {
+    public List<Product> deleteAllProducts(List<Long> ids) {
+        List<Product> listOfProducts = new LinkedList<>();
+        if (ids.size() > 0) {
+            for (Long id : ids) {
+                Optional<Product> product = productRepo.findById(id);
+                if (product.isPresent()) {
+                    productRepo.delete(product.get());
+                }
+                listOfProducts.add(product.get());
+            }
+        } else {
+            return null;
+        }
 
+        return listOfProducts;
     }
 }
